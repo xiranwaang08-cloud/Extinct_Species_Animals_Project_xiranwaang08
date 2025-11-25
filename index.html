@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Last Witnesses – Eternal Silence</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+  <style>
+    html, body {
+      margin:0; padding:0; height:100%; overflow-x:hidden;
+      background:#0d0d0d; font-family:Georgia,serif; cursor:none; color:white;
+    }
+    /* 關鍵修正！讓最後一隻烏龜下面還有一大段空白 */
+    body { 
+      overflow-y:auto; 
+      min-height:800vh !important;   /* 從 650vh → 800vh，絕對夠長 */
+      padding:400px 0 2500px 0 !important;  /* 底部留超大空間 */
+    }
+    canvas { position:fixed !important; top:0; left:0; z-index:1; pointer-events:none !important; }
+  </style>
+</head>
+<body>
+<script>
+let species = [];
+let images = {};
+let selected = null;
+let mouseTrail = [];
+let dataLoaded = false;
+
+function preload() {
+  loadJSON("Extinction.json", (data) => {
+    species = data;
+    species.forEach(s => {
+      const path = "images/" + s.image;
+      images[s.image] = loadImage(path);
+    });
+    dataLoaded = true;
+    positionEverything();
+  });
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  document.querySelector('canvas').style.pointerEvents = 'none';
+}
+
+function draw() {
+  clear();
+
+  // 鼠標光點
+  mouseTrail.push({x:mouseX, y:mouseY});
+  if(mouseTrail.length > 35) mouseTrail.shift();
+  noStroke();
+  for(let i=0; i<mouseTrail.length; i++){
+    let a = map(i,0,mouseTrail.length,255,0);
+    fill(100,180,255,a*0.7);
+    ellipse(mouseTrail[i].x, mouseTrail[i].y, i*1.8);
+  }
+
+  if(!dataLoaded) return;
+
+  drawTimelineAndLabels();
+  drawAllSpecies();
+  if(selected) drawInfoCard(selected);
+}
+
+function positionEverything() {
+  const spacing = height < 800 ? 240 : 300;
+  let y = 500;
+  species.forEach((s, i) => {
+    s.targetY = y + i * spacing;
+    s.x = width / 2;
+    s.nameY = s.targetY - 160;
+  });
+}
+
+function drawTimelineAndLabels() {
+  const scrollY = window.scrollY || window.pageYOffset;
+  const startY = 320 - scrollY;
+  const endY = species.length * 300 + 1000 - scrollY;
+
+  // 時間軸
+  let pulse = sin(frameCount*0.018)*80 + 80;
+  drawingContext.shadowBlur = pulse;
+  drawingContext.shadowColor = "rgba(100,180,255,0.8)";
+  stroke(80,140,220); strokeWeight(9);
+  line(width/2, startY, width/2, endY);
+  drawingContext.shadowBlur = 0;
+
+  // 標題
+  fill(255);
+  textAlign(CENTER, TOP);
+  textSize(52);
+  textStyle(BOLD);
+  drawingContext.shadowBlur = 50;
+  drawingContext.shadowColor = color(100,200,255);
+  text("200,000 years before present", width/2, startY - 80);
+
+  textAlign(CENTER, BOTTOM);
+  text("2024 CE", width/2, endY + 80);
+  drawingContext.shadowBlur = 0;
+}
+
+function drawAllSpecies() {
+  const scrollY = window.scrollY || window.pageYOffset;
+
+  species.forEach(s => {
+    let screenY = s.targetY - scrollY + height/2;
+    let d = dist(mouseX, mouseY, s.x, screenY);
+    let hovered = d < 150;
+    let size = hovered ? 170 : 95;
+    let alpha = constrain(map(abs(screenY - height/2), 0, height*1.6, 255, 40), 40, 255);
+
+    drawingContext.shadowBlur = hovered ? 260 : 110;
+    drawingContext.shadowColor = color(100,180,255,alpha*0.9);
+
+    for(let r=size; r>0; r-=4){
+      fill(lerpColor(color(10,10,40), color(255), r/size*0.32));
+      noStroke();
+      ellipse(s.x, screenY, r*2);
+    }
+    noFill(); stroke(100,180,255); strokeWeight(9);
+    ellipse(s.x, screenY, size*2 + 35);
+
+    push();
+    translate(s.x, screenY + sin(frameCount*0.02 + s.year*0.001)*20);
+    imageMode(CENTER);
+    drawingContext.save();
+    drawingContext.beginPath();
+    drawingContext.arc(0,0,85,0,TWO_PI);
+    drawingContext.clip();
+    if(images[s.image]) image(images[s.image],0,0,170,170);
+    drawingContext.restore();
+    noFill(); stroke(255); strokeWeight(11);
+    ellipse(0,0,180);
+    pop();
+
+    fill(255,alpha);
+    textAlign(CENTER,CENTER);
+    textStyle(BOLD);
+    textSize(hovered ? 52 : 34);
+    drawingContext.shadowBlur = 45;
+    drawingContext.shadowColor = color(100,200,255);
+    text(s.name, s.x, s.nameY - scrollY + height/2);
+    drawingContext.shadowBlur = 0;
+
+    fill(255,210);
+    noStroke();
+    rect(s.x-120, screenY+110, 240, 56, 28);
+    fill(0); textSize(19);
+    text(s.year<0 ? Math.abs(s.year)+" BCE" : s.year+" CE", s.x, screenY+138);
+  });
+}
+
+// drawInfoCard 和 mousePressed 完全不變（保持最美）
+function drawInfoCard(s) {
+  let cardX = constrain(mouseX+80, 80, width-700);
+  let cardY = constrain(mouseY-400, 80, height-900);
+
+  drawingContext.shadowBlur = 180;
+  drawingContext.shadowColor = color(100,180,255);
+  fill(10,10,40,250);
+  stroke(100,180,255); strokeWeight(16);
+  rect(cardX, cardY, 620, 780, 55);
+
+  fill(255); textSize(64); textStyle(BOLD);
+  text(s.name, cardX+65, cardY+65);
+
+  fill(200); textSize(34); textStyle(ITALIC);
+  text("Last seen: " + s.lastSeen, cardX+65, cardY+160);
+
+  fill(180); textSize(30);
+  text("Scientific name:", cardX+65, cardY+220);
+  fill(255); textStyle(BOLD);
+  text(s.scientificName, cardX+65, cardY+265);
+
+  if(images[s.image]){
+    imageMode(CORNER);
+    drawingContext.save();
+    drawingContext.roundRect ??= (x,y,w,h,r)=>rect(x,y,w,h,r);
+    drawingContext.roundRect(cardX+65, cardY+320, 490, 400, 48);
+    drawingContext.clip();
+    image(images[s.image], cardX+65, cardY+320, 490, 400);
+    drawingContext.restore();
+  }
+
+  fill(180); textSize(30);
+  text("Cause of Extinction:", cardX+65, cardY+740);
+  fill(230);
+  text("• " + s.causeOfExtinction.join("\n• "), cardX+65, cardY+785, 510);
+}
+
+function mousePressed() {
+  if(!dataLoaded) return;
+  const scrollY = window.scrollY || window.pageYOffset;
+  for(let s of species){
+    let screenY = s.targetY - scrollY + height/2;
+    if(dist(mouseX, mouseY, s.x, screenY) < 150){
+      selected = selected === s ? null : s;
+      break;
+    }
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  if(dataLoaded) positionEverything();
+}
+</script>
+</body>
+</html>
