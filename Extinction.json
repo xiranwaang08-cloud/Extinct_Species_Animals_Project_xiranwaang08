@@ -1,194 +1,140 @@
 [
   {
-    "name": "La Brea Owl",
-    "scientificName": "Oraristic brea",
-    "lastSeen": "10250–9180 BC",
-    "year": -10250,
-    "image": "la_brea_owl.png",
-    "causeOfExtinction": ["Climate Change", "Competition with Homo Sapiens"]
-  },
-  {
-    "name": "Irish Elk",
-    "scientificName": "Megaloceros giganteus",
-    "lastSeen": "7700 BC",
-    "year": -7700,
-    "image": "irish_elk.png",
-    "causeOfExtinction": ["Climate change", "Hunting"]
-  },
-  {
-    "name": "Woolly Mammoth",
-    "scientificName": "Mammuthus primigenius",
-    "lastSeen": "2000 BC",
-    "year": -2000,
-    "image": "woolly_mammoth.png",
-    "causeOfExtinction": ["Climate change", "Human hunting"]
-  },
-  {
-    "name": "Giant Moa",
-    "scientificName": "Dinornis spp.",
-    "lastSeen": "1400",
-    "year": 1400,
-    "image": "giant_moa.png",
-    "causeOfExtinction": ["Overhunting by humans"]
-  },
-  {
-    "name": "Bermuda Saw-whet Owl",
-    "scientificName": "Aegolius gradyi",
-    "lastSeen": "1609–1610",
-    "year": 1610,
-    "image": "bermuda_saw_whet_owl.png",
-    "causeOfExtinction": ["Habitat destruction", "Introduced predators"]
-  },
-  {
-    "name": "Elephant Bird",
-    "scientificName": "Aepyornis maximus",
-    "lastSeen": "1600",
-    "year": 1600,
-    "image": "elephant_bird.png",
-    "causeOfExtinction": ["Egg collection", "Hunting"]
-  },
-  {
-    "name": "Broad-billed Parrot",
-    "scientificName": "Lophopsittacus mauritianus",
-    "lastSeen": "1670s",
-    "year": 1675,
-    "image": "broad_billed_parrot.png",
-    "causeOfExtinction": ["Habitat destruction", "Hunting"]
+    "name": "Atlantic Gray Whale",
+    "year": 1740,
+    "image": "atlantic_gray_whale_copy.png",
+    "info": "The Atlantic gray whale went extinct in the 18th century due to hunting. It once lived in the North Atlantic Ocean."
   },
   {
     "name": "Dodo",
-    "scientificName": "Raphus cucullatus",
-    "lastSeen": "1681",
-    "year": 1681,
+    "year": 1662,
     "image": "dodo.png",
-    "causeOfExtinction": ["Hunting", "Invasive species"]
+    "info": "The dodo was a flightless bird endemic to Mauritius. It became extinct due to hunting and invasive species."
   },
   {
-    "name": "Atlantic Gray Whale",
-    "scientificName": "Eschrichtius robustus (Atlantic population)",
-    "lastSeen": "1700s",
-    "year": 1750,
-    "image": "atlantic_gray_whale.png",
-    "causeOfExtinction": ["Hunting"]
-  },
-  {
-    "name": "Mauritian Wood Pigeon",
-    "scientificName": "Columba thiriouxi",
-    "lastSeen": "1735",
-    "year": 1735,
-    "image": "mauritian_wood_pigeon.png",
-    "causeOfExtinction": ["Habitat destruction", "Hunting"]
-  },
-  {
-    "name": "Mauritius Turtle Dove",
-    "scientificName": "Nesoenas cicur",
-    "lastSeen": "1735",
-    "year": 1735,
-    "image": "mauritius_turtle_dove.png",
-    "causeOfExtinction": ["Habitat destruction", "Hunting"]
-  },
-  {
-    "name": "Steller's Sea Cow",
-    "scientificName": "Hydrodamalis gigas",
-    "lastSeen": "1768",
-    "year": 1768,
-    "image": "stellers_sea_cow.png",
-    "causeOfExtinction": ["Overhunting"]
+    "name": "Elephant Bird",
+    "year": 1700,
+    "image": "elephant_bird.png",
+    "info": "One of the largest birds ever to exist, native to Madagascar. Overhunting and habitat destruction led to its extinction."
   },
   {
     "name": "Great Auk",
-    "scientificName": "Pinguinus impennis",
-    "lastSeen": "1844",
     "year": 1844,
     "image": "great_auk.png",
-    "causeOfExtinction": ["Hunting for feathers, eggs, meat"]
+    "info": "A flightless seabird hunted to extinction for feathers, meat, and oil."
   },
   {
-    "name": "Quagga",
-    "scientificName": "Equus quagga quagga",
-    "lastSeen": "1883",
-    "year": 1883,
-    "image": "quagga.png",
-    "causeOfExtinction": ["Hunting"]
+    "name": "Giant Moa",
+    "year": 1440,
+    "image": "giant_moa.png",
+    "info": "A massive flightless bird from New Zealand, wiped out by overhunting by early humans."
   },
   {
-    "name": "Newfoundland Wolf",
-    "scientificName": "Canis lupus beothucus",
-    "lastSeen": "1911",
-    "year": 1911,
-    "image": "newfoundland_wolf.png",
-    "causeOfExtinction": ["Hunting", "Habitat loss"]
+    "name": "Irish Elk",
+    "year": 7700,
+    "image": "irish_elk.png",
+    "info": "Known for its enormous antlers, the Irish elk went extinct after the last Ice Age."
   },
   {
     "name": "Passenger Pigeon",
-    "scientificName": "Ectopistes migratorius",
-    "lastSeen": "1914",
     "year": 1914,
     "image": "passenger_pigeon.png",
-    "causeOfExtinction": ["Habitat destruction", "Overhunting"]
+    "info": "Once one of the most abundant birds in North America, hunted to extinction in just a few decades."
   },
   {
-    "name": "Carolina Parrot",
-    "scientificName": "Conuropsis carolinensis",
-    "lastSeen": "1918",
-    "year": 1918,
-    "image": "mauritius_grey_parrot.png",
-    "causeOfExtinction": ["Habitat loss", "Hunting"]
+    "name": "Steller's Sea Cow",
+    "year": 1768,
+    "image": "stellers_sea_cow.png",
+    "info": "A giant marine mammal discovered in 1741 and hunted to extinction only 27 years later."
   },
   {
-    "name": "Tasmanian Tiger",
-    "scientificName": "Thylacinus cynocephalus",
-    "lastSeen": "1936",
-    "year": 1936,
-    "image": "tasmanian_tiger.png",
-    "causeOfExtinction": ["Habitat loss", "Hunting"]
-  },
-  {
-    "name": "Delalande's Coua",
-    "scientificName": "Coua delalandei",
-    "lastSeen": "1870",
-    "year": 1870,
-    "image": "delalandei_coua.png",
-    "causeOfExtinction": ["Predation by introduced species"]
-  },
-  {
-    "name": "Golden Toad",
-    "scientificName": "Incilius periglenes",
-    "lastSeen": "1989",
-    "year": 1989,
-    "image": "golden_toad.png",
-    "causeOfExtinction": ["Climate change", "Habitat loss"]
+    "name": "Quagga",
+    "year": 1883,
+    "image": "quagga.png",
+    "info": "A zebra subspecies with unique striping. Extinct due to hunting in South Africa."
   },
   {
     "name": "Pyrenean Ibex",
-    "scientificName": "Capra pyrenaica pyrenaica",
-    "lastSeen": "2000",
     "year": 2000,
     "image": "pyrenean_ibex.png",
-    "causeOfExtinction": ["Hunting"]
+    "info": "One of the few species to go extinct twice—once naturally, and again after a failed cloning attempt."
   },
   {
-    "name": "Baiji",
-    "scientificName": "Lipotes vexillifer",
-    "lastSeen": "2006",
+    "name": "Tasmanian Tiger",
+    "year": 1936,
+    "image": "tasmanian_tiger.png",
+    "info": "Also known as the thylacine, hunted to extinction in Australia."
+  },
+  {
+    "name": "Woolly Mammoth",
+    "year": -2000,
+    "image": "woolly_mammoth.png",
+    "info": "One of the most iconic Ice Age animals. Some populations survived on islands until 2000 BCE."
+  },
+  {
+    "name": "Baiji (Yangtze River Dolphin)",
     "year": 2006,
     "image": "baiji.png",
-    "causeOfExtinction": ["Habitat destruction", "Pollution"]
+    "info": "Declared functionally extinct due to pollution, habitat loss, and river traffic."
   },
   {
-    "name": "Western Black Rhinoceros",
-    "scientificName": "Diceros bicornis longipes",
-    "lastSeen": "2011",
-    "year": 2011,
-    "image": "black_rhino.png",
-    "causeOfExtinction": ["Poaching"]
+    "name": "Newfoundland Wolf",
+    "year": 1930,
+    "image": "newfoundland_wolf.png",
+    "info": "A wolf subspecies native to Newfoundland, driven extinct by bounty hunting."
   },
   {
     "name": "Pinta Island Tortoise",
-    "scientificName": "Chelonoidis abingdonii",
-    "lastSeen": "2012",
     "year": 2012,
     "image": "pinta_tortoise.png",
-    "causeOfExtinction": ["Habitat destruction", "Invasive species"]
+    "info": "The species included 'Lonesome George', the last known individual, who died in 2012."
+  },
+  {
+    "name": "Golden Toad",
+    "year": 1989,
+    "image": "golden_toad.png",
+    "info": "Disappeared rapidly due to climate change and fungal disease."
+  },
+  {
+    "name": "Broad-billed Parrot",
+    "year": 1680,
+    "image": "broad_billed_parrot.png",
+    "info": "A large parrot from Mauritius, extinct likely due to hunting and invasive species."
+  },
+  {
+    "name": "Mauritius Turtle Dove",
+    "year": 1730,
+    "image": "mauritius_turtle_dove.png",
+    "info": "Endemic to Mauritius, disappeared due to habitat loss."
+  },
+  {
+    "name": "Mauritius Grey Parrot",
+    "year": 1730,
+    "image": "mauritius_grey_parrot.png",
+    "info": "A large parrot native to Mauritius, extinct from hunting."
+  },
+  {
+    "name": "Mauritian Wood Pigeon",
+    "year": 1830,
+    "image": "mauritian_wood_pigeon.png",
+    "info": "Another bird lost to the ecological collapse of Mauritius."
+  },
+  {
+    "name": "Bermuda Saw-whet Owl",
+    "year": 1500,
+    "image": "bermuda_saw_whet_owl.png",
+    "info": "A small owl species wiped out shortly after human arrival."
+  },
+  {
+    "name": "La Brea Owl",
+    "year": 11000,
+    "image": "la_brea_owl.png",
+    "info": "Known from the La Brea tar pits, disappeared in the late Pleistocene."
+  },
+  {
+    "name": "Delalande’s Coua",
+    "year": 1834,
+    "image": "delalandei_coua.png",
+    "info": "A Malagasy cuckoo species lost due to habitat destruction."
   }
 ]
