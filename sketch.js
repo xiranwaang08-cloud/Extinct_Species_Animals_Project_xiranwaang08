@@ -1,143 +1,72 @@
-let species = [];
-let images = {};
-let timelineStart = -200000;  // 200,000 years ago
-let timelineEnd = 2024;
-let margin = 120;
-let timelineY;
-let lanesAssigned = false;
-
-function preload() {
-  // Load JSON synchronously via preload (must run from local server)
-  let data = loadJSON("Extinction.json");
-  
-  // Ensure species is always an array
-  species = Array.isArray(data) ? data : Object.values(data);
-
-  // Preload all images
-  species.forEach(s => {
-    if (s.image) images[s.image] = loadImage("images/" + s.image);
-  });
-}
-
-function setup() {
-  createCanvas(windowWidth, windowHeight);
-  timelineY = height / 2;
-
-  if (!species || species.length === 0) {
-    console.error("No species loaded! Make sure Extinction.json exists and path is correct.");
-    return;
-  }
-
-  // Map x positions along timeline
-  species.forEach(s => {
-    s.x = map(s.year ?? 0, timelineStart, timelineEnd, margin, width - margin);
-  });
-
-  // Assign lanes to avoid overlap
-  assignLanes(species);
-  lanesAssigned = true;
-
-  console.log(`Loaded ${species.length} species, max lanes used: ${maxLane(species)}`);
-}
+let popupProgress = 0;
 
 function draw() {
-  background(245);
-
-  drawTimeline();
-
-  if (lanesAssigned) drawSpeciesDots();
-}
-
-function drawTimeline() {
-  stroke(0);
-  strokeWeight(3);
-  line(margin, timelineY, width - margin, timelineY);
-
-  fill(0);
-  noStroke();
-  textAlign(CENTER, TOP);
-  textSize(16);
-  text("200,000 years before present", margin, timelineY - 40);
-  text("2024 CE", width - margin, timelineY - 40);
-
-  // Tick marks every 50,000 years
-  stroke(100);
-  strokeWeight(1);
-  for (let y = -200000; y <= 0; y += 50000) {
-    let x = map(y, timelineStart, timelineEnd, margin, width - margin);
-    line(x, timelineY - 8, x, timelineY + 8);
+  // ...其他 draw 代碼
+  if (selected) {
+    if (popupProgress < 1) popupProgress += 0.05; // 動畫速度
+    drawInfoCard(selected, popupProgress);
+  } else {
+    popupProgress = 0; // 關閉時重置
   }
 }
 
-function assignLanes(list) {
-  list.sort((a, b) => a.x - b.x);
-  const occupiedUntil = [];
+function drawInfoCard(s, progress) {
+  // progress: 0~1
+  const cardW = 520;
+  const padding = 40;
 
-  list.forEach(s => {
-    let placed = false;
-    for (let i = 0; i < occupiedUntil.length; i++) {
-      if (s.x - occupiedUntil[i] > 100) {
-        s.lane = i;
-        occupiedUntil[i] = s.x + 60;
-        placed = true;
-        break;
-      }
-    }
-    if (!placed) {
-      s.lane = occupiedUntil.length;
-      occupiedUntil.push(s.x + 60);
-    }
-  });
-}
+  // 計算圖片大小
+  let maxW = 440, maxH = 340;
+  let imgW = images[s.image] ? images[s.image].width : 1;
+  let imgH = images[s.image] ? images[s.image].height : 1;
+  let ratio = imgW / imgH;
+  let drawW = maxW;
+  let drawH = maxW / ratio;
+  if (drawH > maxH) { drawH = maxH; drawW = maxH * ratio; }
 
-function maxLane(list) {
-  return list.length > 0 ? Math.max(...list.map(s => s.lane)) + 1 : 0;
-}
+  const lineHeight = 26;
+  const lineCount = 3 + s.causeOfExtinction.length;
+  const textHeight = lineCount * lineHeight;
+  const cardH = drawH + textHeight + padding * 3;
 
-function drawSpeciesDots() {
-  const laneHeight = 70;
+  // 卡片目標位置
+  let targetX = constrain(mouseX + 60, 40, width - cardW - 40);
+  let targetY = constrain(mouseY - cardH / 2, 40, canvasHeight - cardH - 40);
 
-  species.forEach(s => {
-    if (s.lane === undefined) return;
+  // 漸入效果：從圖片位置出發
+  let startX = s.x - cardW/2;
+  let startY = s.y - cardH/2;
+  let cardX = lerp(startX, targetX, progress);
+  let cardY = lerp(startY, targetY, progress);
 
-    const compactLane = Math.floor(s.lane / 2);
-    const direction = s.lane % 2 === 0 ? 1 : -1;
-    const y = timelineY + direction * compactLane * laneHeight;
+  // 淡入透明度
+  let alphaVal = progress * 255;
 
-    // Dot
-    fill(255);
-    stroke(0);
-    strokeWeight(2);
-    ellipse(s.x, y, 18, 18);
+  // 繪製卡片
+  fill(255,255,253, alphaVal);
+  stroke(0,0,0,50*progress);
+  strokeWeight(6);
+  rect(cardX, cardY, cardW, cardH, 28);
 
-    // Species name
-    fill(0);
-    noStroke();
-    textAlign(CENTER, BOTTOM);
-    textSize(14);
-    text(s.name, s.x, y - 22);
+  if (images[s.image]) {
+    imageMode(CORNER);
+    tint(255, alphaVal); // 圖片淡入
+    image(images[s.image], cardX + padding, cardY + padding, drawW, drawH);
+    noFill();
+    stroke(0,0,0,50*progress);
+    strokeWeight(4);
+    rect(cardX + padding, cardY + padding, drawW, drawH);
+  }
 
-    // Year
-    fill(80);
-    textSize(12);
-    const yearVal = s.year ?? 0;
-    text(yearVal < 0 ? Math.abs(yearVal) + " BCE" : yearVal + " CE", s.x, y + 35);
+  // 文字
+  noStroke(); fill(80, alphaVal); textAlign(LEFT, TOP); textFont('Georgia'); textLeading(lineHeight);
 
-    // Image
-    if (s.image && images[s.image]) {
-      imageMode(CENTER);
-      image(images[s.image], s.x, y + 60, 50, 50);
-    }
-  });
-}
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  timelineY = height / 2;
-
-  if (!species || !lanesAssigned) return;
-
-  species.forEach(s => {
-    s.x = map(s.year ?? 0, timelineStart, timelineEnd, margin, width - margin);
-  });
+  let textY = cardY + padding + drawH + 10;
+  textSize(28); textStyle(ITALIC);
+  text(s.name, cardX + padding, textY);
+  textSize(20);
+  text("Last seen: " + s.lastSeen, cardX + padding, textY + 32);
+  textSize(18);
+  text("Scientific name: " + s.scientificName, cardX + padding, textY + 60);
+  text("Cause of Extinction:\n• " + s.causeOfExtinction.join("\n• "), cardX + padding, textY + 90, cardW - padding*2);
 }

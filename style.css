@@ -1,0 +1,12 @@
+#projectInfoBtn {
+    position: fixed;
+    top: 20px;
+    left: 20px; /* 左上角 */
+    z-index: 1000;
+    padding: 8px 16px;
+    font-size: 16px;
+    background: #eee;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}

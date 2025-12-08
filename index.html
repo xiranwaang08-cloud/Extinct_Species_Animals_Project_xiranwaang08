@@ -15,6 +15,46 @@
     #defaultCanvas0 {
       display: block;
     }
+
+    /* Fixed Button */
+    #projectInfoBtn {
+      position: fixed;
+      top: 20px;
+      left: 20px; /* 左上角 */
+      z-index: 1000;
+      padding: 8px 16px;
+      font-size: 16px;
+      background: #eee;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000; /* 高於 p5 canvas 的層級 */
+      left: 0; top: 0; width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      overflow: auto;
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 600px;
+      border: 1px solid #888;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover { color: #000; }
   </style>
 </head>
 <body>
@@ -111,7 +151,6 @@ function positionEverything() {
   species.forEach((s,i) => {
     s.x = startX;
     s.y = y;
-    // 左右交錯文字靠近圓圈
     s.offsetX = (i%2===0 ? -80 : 80);
     s.nameY = s.y;
     s.yearY = s.y + 24;
@@ -132,11 +171,9 @@ function drawTimeline() {
 // ==================== Draw Species ====================
 function drawAllSpecies() {
   species.forEach((s,i) => {
-    // 圓圈
     fill(250,250,245); stroke(180); strokeWeight(4); 
     ellipse(s.x, s.y, 140, 140);
 
-    // 圖片保持原比例
     if (images[s.image] && images[s.image].width) {
       push();
       translate(s.x, s.y);
@@ -147,7 +184,6 @@ function drawAllSpecies() {
       pop();
     }
 
-    // 名稱 & 年份 左右交錯
     noStroke(); fill(60); textFont('Georgia'); textSize(20); textStyle(ITALIC);
     textAlign(i%2===0?RIGHT:LEFT, CENTER);
     text(s.name, s.x + s.offsetX, s.nameY);
@@ -158,30 +194,131 @@ function drawAllSpecies() {
 
 // ==================== Info Card ====================
 function drawInfoCard(s) {
-  const cardW = 520, cardH = 680;
-  let cardX = constrain(mouseX+60, 40, width-cardW-40);
-  let cardY = constrain(mouseY-cardH/2, 40, canvasHeight-cardH-40);
+  const cardW = 520;
+  const padding = 40; // 卡片內邊距
 
-  fill(255,255,253); stroke(0,0,0,50); strokeWeight(6); rect(cardX, cardY, cardW, cardH, 28);
+  // 圖片尺寸
+  let maxW = 440;
+  let maxH = 340;
+  let imgW = images[s.image] ? images[s.image].width : 1;
+  let imgH = images[s.image] ? images[s.image].height : 1;
+  let ratio = imgW / imgH;
 
-  fill(80); textAlign(LEFT,TOP); textSize(28); textStyle(ITALIC); textFont('Georgia');
-  text(s.name, cardX+40, cardY+40);
-
-  fill(80); textSize(20); textStyle(ITALIC);
-  text("Last seen: " + s.lastSeen, cardX+40, cardY+100);
-
-  fill(80); textSize(18); textStyle(ITALIC);
-  text("Scientific name: " + s.scientificName, cardX+40, cardY+140);
-
-  if (images[s.image]) {
-    imageMode(CORNER);
-    image(images[s.image], cardX+40, cardY+180, 440, 340);
-    noFill(); stroke(0,0,0,50); strokeWeight(4); rect(cardX+40, cardY+180, 440, 340);
+  let drawW = maxW;
+  let drawH = maxW / ratio;
+  if (drawH > maxH) {
+    drawH = maxH;
+    drawW = maxH * ratio;
   }
 
-  fill(80); textSize(18); textStyle(ITALIC); textLeading(28); textFont('Georgia');
-  text("Cause of Extinction:\n• " + s.causeOfExtinction.join("\n• "), cardX+40, cardY+540, 440);
+  // 計算文字高度自適應
+  const lineHeight = 26;
+  const lineCount = 3 + s.causeOfExtinction.length; // name + lastSeen + scientific + 原因每行
+  const textHeight = lineCount * lineHeight;
+
+  const cardH = drawH + textHeight + padding * 3;
+
+  // 卡片位置
+  let cardX = constrain(mouseX + 60, 40, width - cardW - 40);
+  let cardY = constrain(mouseY - cardH / 2, 40, canvasHeight - cardH - 40);
+
+  // 卡片背景
+  fill(255,255,253);
+  stroke(0,0,0,50);
+  strokeWeight(6);
+  rect(cardX, cardY, cardW, cardH, 28);
+
+  // 圖片
+  if (images[s.image]) {
+    imageMode(CORNER);
+    image(images[s.image], cardX + padding, cardY + padding, drawW, drawH);
+
+    // 圖片邊框
+    noFill();
+    stroke(0,0,0,50);
+    strokeWeight(4);
+    rect(cardX + padding, cardY + padding, drawW, drawH);
+  }
+
+  // 文字
+  fill(80);
+  noStroke(); // 去掉文字描邊
+  textAlign(LEFT, TOP);
+  textFont('Georgia');
+  textLeading(lineHeight);
+
+  let textY = cardY + padding + drawH + 10; // 貼近圖片，10px間距
+
+  textSize(28);
+  textStyle(ITALIC);
+  text(s.name, cardX + padding, textY);
+
+  textSize(20);
+  text("Last seen: " + s.lastSeen, cardX + padding, textY + 32);
+
+  textSize(18);
+  text("Scientific name: " + s.scientificName, cardX + padding, textY + 60);
+
+  text("Cause of Extinction:\n• " + s.causeOfExtinction.join("\n• "), cardX + padding, textY + 90, cardW - padding*2);
 }
+</script>
+
+<!-- Project Info Button & Modal -->
+<button id="projectInfoBtn">Project Info</button>
+
+<div id="projectInfoModal" class="modal">
+  <div class="modal-content">
+    <span id="closeProjectInfo" class="close">&times;</span>
+    <h2>Project Info</h2>
+    <div style="max-height: 500px; overflow-y: auto; font-size: 16px; line-height: 1.6;">
+      <p><strong>Why I picked ‘Extinct Species’ as the theme</strong><br>
+      The reason why I chose extinct species is that I’ve always been obsessed with nature and animals. I’m aware of extinct species and some of their extinct reasons, such as hunting, deforestation, and loss of habitats. Many species no longer exist. I intend to turn my obsession and concept into something that people can interact with, instead of simply reading it. Through visual elements and interactive design, the audience can experience a sense of curiosity, connection, and especially loss, at the same time.</p>
+
+      <p><strong>Why these animals</strong><br>
+      I picked around 24 animals for this interactive design project, such as the Irish Elk, Woolly Mammoth, Dodo, and Steller’s Sea Cow. They can tell a story about the world they used to live and stay, instead of simply being charming and unique. Their behaviours and features really stood out to me, making them unforgettable. They can be examples of challenges of the whole ecosystem and environment, which are now threatened. From my personal perspective, I wished to share a sense of curiosity, responsibility, and re-consideration of the environmental issues and threats to current animals nowadays.</p>
+
+      <p><strong>How they became extinct</strong><br>
+      Those species went extinct due to a variety of human behaviours and environmental changes.</p>
+
+      <ul>
+        <li>Atlantic Gray Whale (1740) – Humans hunted them in the North Atlantic until none were left.</li>
+        <li>Dodo (1662) – This flightless bird couldn’t survive hunting and invasive animals on Mauritius.</li>
+        <li>Elephant Bird (1700) – Once Madagascar’s giant bird, it vanished due to hunting and habitat loss.</li>
+        <li>Great Auk (1844) – People hunted it for feathers, meat, and oil.</li>
+        <li>Giant Moa (1440) – Early humans in New Zealand hunted these huge birds to extinction.</li>
+        <li>Irish Elk (7700 BCE) – Changing climates after the last Ice Age made survival impossible.</li>
+        <li>Passenger Pigeon (1914) – Once countless in North America, they were wiped out by overhunting.</li>
+        <li>Steller’s Sea Cow (1768) – Discovered in 1741, hunted to extinction just 27 years later.</li>
+        <li>Quagga (1883) – A uniquely striped zebra lost to hunting in South Africa.</li>
+        <li>Pyrenean Ibex (2000) – Human actions and a failed cloning attempt led to its disappearance.</li>
+        <li>Tasmanian Tiger (1936) – Hunting and habitat loss in Australia sealed its fate.</li>
+        <li>Woolly Mammoth (-2000) – Ice Age ending and climate shifts gradually erased them.</li>
+        <li>Baiji (Yangtze River Dolphin, 2006) – Pollution, river traffic, and habitat loss caused its extinction.</li>
+        <li>Newfoundland Wolf (1930) – Bounty hunting by humans wiped out this wolf subspecies.</li>
+        <li>Pinta Island Tortoise (2012) – ‘Lonesome George’ was the last; human impact led to the species’ end.</li>
+        <li>Golden Toad (1989) – Rapid climate change and fungal disease caused it to vanish.</li>
+        <li>Broad-billed Parrot (1680) – Hunting and invasive species on Mauritius led to its disappearance.</li>
+        <li>Mauritius Turtle Dove (1730) – Its home disappeared as humans changed the landscape.</li>
+        <li>Mauritius Grey Parrot (1730) – Hunted by humans until none remained.</li>
+        <li>Mauritian Wood Pigeon (1830) – Habitat collapse and human pressures wiped it out.</li>
+        <li>Bermuda Saw-whet Owl (1500) – Lost shortly after humans arrived due to habitat loss.</li>
+        <li>La Brea Owl (11000 BCE) – Climate changes in the late Pleistocene erased this species.</li>
+        <li>Delalande’s Coua (1834) – Habitat destruction in Madagascar caused its extinction.</li>
+      </ul>
+
+      <p>Through this section, I wish the audience to comprehensively understand why these species became extinct and reflect on how we can prevent current species being extinct and protect biodiversity nowadays.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const btn = document.getElementById("projectInfoBtn");
+  const modal = document.getElementById("projectInfoModal");
+  const closeBtn = document.getElementById("closeProjectInfo");
+
+  btn.onclick = () => modal.style.display = "block";
+  closeBtn.onclick = () => modal.style.display = "none";
+  window.onclick = e => { if(e.target===modal) modal.style.display="none"; };
 </script>
 </body>
 </html>
