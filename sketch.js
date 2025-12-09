@@ -7,7 +7,7 @@ let popupProgress = 0;
 
 function preload() {
   // 從 JSON 文件加載數據
-  loadJSON('extinction.json', data => {
+  loadJSON('Extinction.json', data => {
     species = data.map(s => ({...s}));
     
     // 按年份排序（從遠古到現代）
