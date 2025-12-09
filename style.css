@@ -1,12 +1,113 @@
+/* ==================== Modal ==================== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 80px auto;
+  padding: 20px 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.close {
+  color: #444;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover { color: #000; }
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(-20px);}
+  to {opacity:1; transform: translateY(0);}
+}
+
+.vote-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 8px 0;
+}
+
+/* ==================== 統一按鈕字體 ==================== */
+#projectInfoBtn,
+#voteBtn {
+  font-family: Georgia, serif;  /* 和頁面一致 */
+  font-size: 16px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+/* ==================== 左上角 Project Info ==================== */
 #projectInfoBtn {
-    position: fixed;
-    top: 20px;
-    left: 20px; /* 左上角 */
-    z-index: 1000;
-    padding: 8px 16px;
-    font-size: 16px;
-    background: #eee;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background-color: #dcd8d2; /* 柔和灰米色系，和背景協調但可區分 */
+  color: #2f2f2f; /* 深灰字，清楚可讀 */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+#projectInfoBtn:hover {
+  transform: translateY(-2px) scale(1.05);
+  background-color: #e5e0d8; /* 溫和變亮 */
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* ==================== 右下角 Vote ==================== */
+#voteBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background-color: #cfc9c1; /* 同色系不同色階 */
+  color: #2f2f2f;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+#voteBtn:hover {
+  transform: translateY(-2px) scale(1.05);
+  background-color: #d9d3ca; /* 溫和變亮 */
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+/* ==================== 投票選項動畫 ==================== */
+.voteOption {
+  font-family: Georgia, serif;
+  font-size: 16px;
+  padding: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  background-color: #fff;
+  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.voteOption:hover {
+  transform: translateY(-2px);
+  background-color: #f0f0f0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.voteOption:active {
+  transform: scale(1.1);
+  background-color: #ffd700; /* 點擊時小黃金色動畫 */
+  box-shadow: 0 6px 12px rgba(0,0,0,0.25);
 }

@@ -4,321 +4,91 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Last Witnesses – Vertical Timeline</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: Georgia, serif;
-      overflow-y: auto;
-    }
-    #defaultCanvas0 {
-      display: block;
-    }
-
-    /* Fixed Button */
-    #projectInfoBtn {
-      position: fixed;
-      top: 20px;
-      left: 20px; /* 左上角 */
-      z-index: 1000;
-      padding: 8px 16px;
-      font-size: 16px;
-      background: #eee;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 2000; /* 高於 p5 canvas 的層級 */
-      left: 0; top: 0; width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      overflow: auto;
-    }
-    .modal-content {
-      background-color: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 12px;
-      max-width: 600px;
-      border: 1px solid #888;
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .close:hover { color: #000; }
-  </style>
 </head>
 <body>
-<script>
-// ==================== Data ====================
-const builtInData = [
-  { "name": "La Brea Owl", "scientificName": "Oraristic brea", "lastSeen": "10250–9180 BC", "year": -10250, "image": "la_brea_owl.png", "causeOfExtinction": ["Climate Change", "Competition with Homo Sapiens"] },
-  { "name": "Irish Elk", "scientificName": "Megaloceros giganteus", "lastSeen": "7700 BC", "year": -7700, "image": "irish_elk.png", "causeOfExtinction": ["Climate change", "Hunting"] },
-  { "name": "Woolly Mammoth", "scientificName": "Mammuthus primigenius", "lastSeen": "2000 BC", "year": -2000, "image": "woolly_mammoth.png", "causeOfExtinction": ["Climate change", "Human hunting"] },
-  { "name": "Giant Moa", "scientificName": "Dinornis spp.", "lastSeen": "1400", "year": 1400, "image": "giant_moa.png", "causeOfExtinction": ["Overhunting by humans"] },
-  { "name": "Bermuda Saw-whet Owl", "scientificName": "Aegolius gradyi", "lastSeen": "1609–1610", "year": 1610, "image": "bermuda_saw_whet_owl.png", "causeOfExtinction": ["Habitat destruction", "Introduced predators"] },
-  { "name": "Elephant Bird", "scientificName": "Aepyornis maximus", "lastSeen": "1600", "year": 1600, "image": "elephant_bird.png", "causeOfExtinction": ["Egg collection", "Hunting"] },
-  { "name": "Broad-billed Parrot", "scientificName": "Lophopsittacus mauritianus", "lastSeen": "1670s", "year": 1675, "image": "broad_billed_parrot.png", "causeOfExtinction": ["Habitat destruction", "Hunting"] },
-  { "name": "Dodo", "scientificName": "Raphus cucullatus", "lastSeen": "1681", "year": 1681, "image": "dodo.png", "causeOfExtinction": ["Hunting", "Invasive species"] },
-  { "name": "Atlantic Gray Whale", "scientificName": "Eschrichtius robustus (Atlantic population)", "lastSeen": "1700s", "year": 1750, "image": "atlantic_gray_whale_copy.png", "causeOfExtinction": ["Hunting"] },
-  { "name": "Mauritian Wood Pigeon", "scientificName": "Columba thiriouxi", "lastSeen": "1735", "year": 1735, "image": "mauritian_wood_pigeon.png", "causeOfExtinction": ["Habitat destruction", "Hunting"] },
-  { "name": "Mauritius Turtle Dove", "scientificName": "Nesoenas cicur", "lastSeen": "1735", "year": 1735, "image": "mauritius_turtle_dove.png", "causeOfExtinction": ["Habitat destruction", "Hunting"] },
-  { "name": "Steller's Sea Cow", "scientificName": "Hydrodamalis gigas", "lastSeen": "1768", "year": 1768, "image": "stellers_sea_cow.png", "causeOfExtinction": ["Overhunting"] },
-  { "name": "Great Auk", "scientificName": "Pinguinus impennis", "lastSeen": "1844", "year": 1844, "image": "great_auk.png", "causeOfExtinction": ["Hunting for feathers, eggs, meat"] },
-  { "name": "Quagga", "scientificName": "Equus quagga quagga", "lastSeen": "1883", "year": 1883, "image": "quagga.png", "causeOfExtinction": ["Hunting"] },
-  { "name": "Newfoundland Wolf", "scientificName": "Canis lupus beothucus", "lastSeen": "1911", "year": 1911, "image": "newfoundland_wolf.png", "causeOfExtinction": ["Hunting", "Habitat loss"] },
-  { "name": "Passenger Pigeon", "scientificName": "Ectopistes migratorius", "lastSeen": "1914", "year": 1914, "image": "passenger_pigeon.png", "causeOfExtinction": ["Habitat destruction", "Overhunting"] },
-  { "name": "Carolina Parrot", "scientificName": "Conuropsis carolinensis", "lastSeen": "1918", "year": 1918, "image": "mauritius_grey_parrot.png", "causeOfExtinction": ["Habitat loss", "Hunting"] },
-  { "name": "Tasmanian Tiger", "scientificName": "Thylacinus cynocephalus", "lastSeen": "1936", "year": 1936, "image": "tasmanian_tiger.png", "causeOfExtinction": ["Habitat loss", "Hunting"] },
-  { "name": "Delalande's Coua", "scientificName": "Coua delalandei", "lastSeen": "1870", "year": 1870, "image": "delalandei_coua.png", "causeOfExtinction": ["Predation by introduced species"] },
-  { "name": "Golden Toad", "scientificName": "Incilius periglenes", "lastSeen": "1989", "year": 1989, "image": "golden_toad.png", "causeOfExtinction": ["Climate change", "Habitat loss"] },
-  { "name": "Pyrenean Ibex", "scientificName": "Capra pyrenaica pyrenaica", "lastSeen": "2000", "year": 2000, "image": "pyrenean_ibex.png", "causeOfExtinction": ["Hunting"] },
-  { "name": "Baiji", "scientificName": "Lipotes vexillifer", "lastSeen": "2006", "year": 2006, "image": "baiji.png", "causeOfExtinction": ["Habitat destruction", "Pollution"] },
-  { "name": "Western Black Rhinoceros", "scientificName": "Diceros bicornis longipes", "lastSeen": "2011", "year": 2011, "image": "black_rhino.png", "causeOfExtinction": ["Poaching"] },
-  { "name": "Pinta Island Tortoise", "scientificName": "Chelonoidis abingdonii", "lastSeen": "2012", "year": 2012, "image": "pinta_tortoise.png", "causeOfExtinction": ["Habitat destruction", "Invasive species"] }
-];
-
-// ==================== Global Variables ====================
-let species = [];
-let images = {};
-let timelineY = 260;
-let canvasHeight;
-let selected = null;
-
-// ==================== p5.js ====================
-function preload() {
-  species = builtInData.map(s => ({...s}));
-  species.forEach(s => images[s.image] = loadImage("images/" + s.image));
-}
-
-function setup() {
-  canvasHeight = max(windowHeight, species.length * 260 + 400);
-  createCanvas(windowWidth, canvasHeight);
-  positionEverything();
-}
-
-function draw() {
-  // Muji gradient background
-  for (let y = 0; y < height; y++) {
-    let c = lerpColor(color(245,245,240), color(230,230,225), y/height);
-    stroke(c); line(0,y,width, y);
-  }
-
-  // Title
-  fill(30); noStroke(); textAlign(CENTER, TOP);
-  textSize(72); textStyle(BOLD);
-  text("Last Witnesses", width/2, 60);
-
-  // Subtitle
-  textSize(28); textStyle(ITALIC); textLeading(48); fill(80);
-  text("24 species that vanished during human history", width/2, 180);
-
-  drawTimeline();
-  drawAllSpecies();
-  if (selected) drawInfoCard(selected);
-}
-
-function windowResized() {
-  canvasHeight = max(windowHeight, species.length * 260 + 400);
-  resizeCanvas(windowWidth, canvasHeight);
-  positionEverything();
-}
-
-function mousePressed() {
-  selected = null;
-  for (let s of species) {
-    if (dist(mouseX, mouseY, s.x, s.y) < 90) {
-      selected = s;
-      break;
-    }
-  }
-}
-
-// ==================== Position ====================
-function positionEverything() {
-  const startX = width/2;
-  let y = timelineY + 120;
-  const spacingY = 260;
-  species.forEach((s,i) => {
-    s.x = startX;
-    s.y = y;
-    s.offsetX = (i%2===0 ? -80 : 80);
-    s.nameY = s.y;
-    s.yearY = s.y + 24;
-    y += spacingY;
-  });
-}
-
-// ==================== Timeline ====================
-function drawTimeline() {
-  stroke(200); strokeWeight(5);
-  line(width/2, timelineY, width/2, canvasHeight-50);
-
-  noStroke(); fill(120); textSize(24); textAlign(CENTER);
-  text("200,000 years ago", width/2, timelineY - 30);
-  text("2024 CE", width/2, canvasHeight-40);
-}
-
-// ==================== Draw Species ====================
-function drawAllSpecies() {
-  species.forEach((s,i) => {
-    fill(250,250,245); stroke(180); strokeWeight(4); 
-    ellipse(s.x, s.y, 140, 140);
-
-    if (images[s.image] && images[s.image].width) {
-      push();
-      translate(s.x, s.y);
-      imageMode(CENTER);
-      let ratio = images[s.image].width / images[s.image].height;
-      let w = 124, h = w / ratio;
-      image(images[s.image], 0, 0, w, h);
-      pop();
-    }
-
-    noStroke(); fill(60); textFont('Georgia'); textSize(20); textStyle(ITALIC);
-    textAlign(i%2===0?RIGHT:LEFT, CENTER);
-    text(s.name, s.x + s.offsetX, s.nameY);
-    textSize(16);
-    text(s.lastSeen, s.x + s.offsetX, s.yearY);
-  });
-}
-
-// ==================== Info Card ====================
-function drawInfoCard(s) {
-  const cardW = 520;
-  const padding = 40; // 卡片內邊距
-
-  // 圖片尺寸
-  let maxW = 440;
-  let maxH = 340;
-  let imgW = images[s.image] ? images[s.image].width : 1;
-  let imgH = images[s.image] ? images[s.image].height : 1;
-  let ratio = imgW / imgH;
-
-  let drawW = maxW;
-  let drawH = maxW / ratio;
-  if (drawH > maxH) {
-    drawH = maxH;
-    drawW = maxH * ratio;
-  }
-
-  // 計算文字高度自適應
-  const lineHeight = 26;
-  const lineCount = 3 + s.causeOfExtinction.length; // name + lastSeen + scientific + 原因每行
-  const textHeight = lineCount * lineHeight;
-
-  const cardH = drawH + textHeight + padding * 3;
-
-  // 卡片位置
-  let cardX = constrain(mouseX + 60, 40, width - cardW - 40);
-  let cardY = constrain(mouseY - cardH / 2, 40, canvasHeight - cardH - 40);
-
-  // 卡片背景
-  fill(255,255,253);
-  stroke(0,0,0,50);
-  strokeWeight(6);
-  rect(cardX, cardY, cardW, cardH, 28);
-
-  // 圖片
-  if (images[s.image]) {
-    imageMode(CORNER);
-    image(images[s.image], cardX + padding, cardY + padding, drawW, drawH);
-
-    // 圖片邊框
-    noFill();
-    stroke(0,0,0,50);
-    strokeWeight(4);
-    rect(cardX + padding, cardY + padding, drawW, drawH);
-  }
-
-  // 文字
-  fill(80);
-  noStroke(); // 去掉文字描邊
-  textAlign(LEFT, TOP);
-  textFont('Georgia');
-  textLeading(lineHeight);
-
-  let textY = cardY + padding + drawH + 10; // 貼近圖片，10px間距
-
-  textSize(28);
-  textStyle(ITALIC);
-  text(s.name, cardX + padding, textY);
-
-  textSize(20);
-  text("Last seen: " + s.lastSeen, cardX + padding, textY + 32);
-
-  textSize(18);
-  text("Scientific name: " + s.scientificName, cardX + padding, textY + 60);
-
-  text("Cause of Extinction:\n• " + s.causeOfExtinction.join("\n• "), cardX + padding, textY + 90, cardW - padding*2);
-}
-</script>
 
 <!-- Project Info Button & Modal -->
 <button id="projectInfoBtn">Project Info</button>
-
 <div id="projectInfoModal" class="modal">
   <div class="modal-content">
     <span id="closeProjectInfo" class="close">&times;</span>
-    <h2>Project Info</h2>
-    <div style="max-height: 500px; overflow-y: auto; font-size: 16px; line-height: 1.6;">
-      <p><strong>Why I picked ‘Extinct Species’ as the theme</strong><br>
-      The reason why I chose extinct species is that I’ve always been obsessed with nature and animals. I’m aware of extinct species and some of their extinct reasons, such as hunting, deforestation, and loss of habitats. Many species no longer exist. I intend to turn my obsession and concept into something that people can interact with, instead of simply reading it. Through visual elements and interactive design, the audience can experience a sense of curiosity, connection, and especially loss, at the same time.</p>
+    <h2 style="font-family: Georgia, serif; color: #2f2f2f; margin-bottom: 20px;">Project Info</h2>
+    <div style="max-height: 500px; overflow-y: auto; font-size: 16px; line-height: 1.8; font-family: Georgia, serif; color: #444;">
+      
+      <h3 style="color: #2f2f2f; margin-top: 0;">Why I picked 'Extinct Species' as the theme</h3>
+      <p>The reason why I chose extinct species is that I've always been obsessed with nature and animals. I'm aware of extinct species and some of their extinct reasons, such as hunting, deforestation, and loss of habitats. Many species no longer exist. I intend to turn my obsession and concept into something that people can interact with, instead of simply reading it. Through visual elements and interactive design, the audience can experience a sense of curiosity, connection, and especially loss, at the same time.</p>
 
-      <p><strong>Why these animals</strong><br>
-      I picked around 24 animals for this interactive design project, such as the Irish Elk, Woolly Mammoth, Dodo, and Steller’s Sea Cow. They can tell a story about the world they used to live and stay, instead of simply being charming and unique. Their behaviours and features really stood out to me, making them unforgettable. They can be examples of challenges of the whole ecosystem and environment, which are now threatened. From my personal perspective, I wished to share a sense of curiosity, responsibility, and re-consideration of the environmental issues and threats to current animals nowadays.</p>
+      <h3 style="color: #2f2f2f;">Why these animals</h3>
+      <p>I picked around 24 animals for this interactive design project, such as the Irish Elk, Woolly Mammoth, Dodo, and Steller's Sea Cow. They can tell a story about the world they used to live and stay, instead of simply being charming and unique. Their behaviours and features really stood out to me, making them unforgettable. They can be examples of challenges of the whole ecosystem and environment, which are now threatened. From my personal perspective, I wished to share a sense of curiosity, responsibility, and re-consideration of the environmental issues and threats to current animals nowadays.</p>
 
-      <p><strong>How they became extinct</strong><br>
-      Those species went extinct due to a variety of human behaviours and environmental changes.</p>
-
-      <ul>
-        <li>Atlantic Gray Whale (1740) – Humans hunted them in the North Atlantic until none were left.</li>
-        <li>Dodo (1662) – This flightless bird couldn’t survive hunting and invasive animals on Mauritius.</li>
-        <li>Elephant Bird (1700) – Once Madagascar’s giant bird, it vanished due to hunting and habitat loss.</li>
-        <li>Great Auk (1844) – People hunted it for feathers, meat, and oil.</li>
-        <li>Giant Moa (1440) – Early humans in New Zealand hunted these huge birds to extinction.</li>
-        <li>Irish Elk (7700 BCE) – Changing climates after the last Ice Age made survival impossible.</li>
-        <li>Passenger Pigeon (1914) – Once countless in North America, they were wiped out by overhunting.</li>
-        <li>Steller’s Sea Cow (1768) – Discovered in 1741, hunted to extinction just 27 years later.</li>
-        <li>Quagga (1883) – A uniquely striped zebra lost to hunting in South Africa.</li>
-        <li>Pyrenean Ibex (2000) – Human actions and a failed cloning attempt led to its disappearance.</li>
-        <li>Tasmanian Tiger (1936) – Hunting and habitat loss in Australia sealed its fate.</li>
-        <li>Woolly Mammoth (-2000) – Ice Age ending and climate shifts gradually erased them.</li>
-        <li>Baiji (Yangtze River Dolphin, 2006) – Pollution, river traffic, and habitat loss caused its extinction.</li>
-        <li>Newfoundland Wolf (1930) – Bounty hunting by humans wiped out this wolf subspecies.</li>
-        <li>Pinta Island Tortoise (2012) – ‘Lonesome George’ was the last; human impact led to the species’ end.</li>
-        <li>Golden Toad (1989) – Rapid climate change and fungal disease caused it to vanish.</li>
-        <li>Broad-billed Parrot (1680) – Hunting and invasive species on Mauritius led to its disappearance.</li>
-        <li>Mauritius Turtle Dove (1730) – Its home disappeared as humans changed the landscape.</li>
-        <li>Mauritius Grey Parrot (1730) – Hunted by humans until none remained.</li>
-        <li>Mauritian Wood Pigeon (1830) – Habitat collapse and human pressures wiped it out.</li>
-        <li>Bermuda Saw-whet Owl (1500) – Lost shortly after humans arrived due to habitat loss.</li>
-        <li>La Brea Owl (11000 BCE) – Climate changes in the late Pleistocene erased this species.</li>
-        <li>Delalande’s Coua (1834) – Habitat destruction in Madagascar caused its extinction.</li>
+      <h3 style="color: #2f2f2f;">How they became extinct</h3>
+      <p>Those species went extinct due to a variety of human behaviours and environmental changes.</p>
+      
+      <ul style="line-height: 1.6; padding-left: 20px;">
+        <li><strong>Atlantic Gray Whale (1740)</strong> – Humans hunted them in the North Atlantic until none were left.</li>
+        <li><strong>Dodo (1662)</strong> – This flightless bird couldn't survive hunting and invasive animals on Mauritius.</li>
+        <li><strong>Elephant Bird (1700)</strong> – Once Madagascar's giant bird, it vanished due to hunting and habitat loss.</li>
+        <li><strong>Great Auk (1844)</strong> – People hunted it for feathers, meat, and oil.</li>
+        <li><strong>Giant Moa (1440)</strong> – Early humans in New Zealand hunted these huge birds to extinction.</li>
+        <li><strong>Irish Elk (5700 BCE)</strong> – Changing climates after the last Ice Age made survival impossible.</li>
+        <li><strong>Passenger Pigeon (1914)</strong> – Once countless in North America, they were wiped out by overhunting.</li>
+        <li><strong>Steller's Sea Cow (1768)</strong> – Discovered in 1741, hunted to extinction just 27 years later.</li>
+        <li><strong>Quagga (1883)</strong> – A uniquely striped zebra lost to hunting in South Africa.</li>
+        <li><strong>Pyrenean Ibex (2000)</strong> – Human actions and a failed cloning attempt led to its disappearance.</li>
+        <li><strong>Tasmanian Tiger (1936)</strong> – Hunting and habitat loss in Australia sealed its fate.</li>
+        <li><strong>Woolly Mammoth (2000 BCE)</strong> – Ice Age ending and climate shifts gradually erased them.</li>
+        <li><strong>Baiji (Yangtze River Dolphin, 2006)</strong> – Pollution, river traffic, and habitat loss caused its extinction.</li>
+        <li><strong>Newfoundland Wolf (1930)</strong> – Bounty hunting by humans wiped out this wolf subspecies.</li>
+        <li><strong>Western Black Rhinoceros (2011)</strong> – Relentless poaching for its horn led to its extinction in West Africa.</li>
+        <li><strong>Pinta Island Tortoise (2012)</strong> – 'Lonesome George' was the last; human impact led to the species' end.</li>
+        <li><strong>Golden Toad (1989)</strong> – Rapid climate change and fungal disease caused it to vanish.</li>
+        <li><strong>Broad-billed Parrot (1680)</strong> – Hunting and invasive species on Mauritius led to its disappearance.</li>
+        <li><strong>Mauritius Turtle Dove (1730)</strong> – Its home disappeared as humans changed the landscape.</li>
+        <li><strong>Mauritius Grey Parrot (1730)</strong> – Hunted by humans until none remained.</li>
+        <li><strong>Mauritian Wood Pigeon (1830)</strong> – Habitat collapse and human pressures wiped it out.</li>
+        <li><strong>Bermuda Saw-whet Owl (1500)</strong> – Lost shortly after humans arrived due to habitat loss.</li>
+        <li><strong>La Brea Owl (8500 BCE)</strong> – Climate changes in the late Pleistocene erased this species.</li>
+        <li><strong>Delalande's Coua (1834)</strong> – Habitat destruction in Madagascar caused its extinction.</li>
       </ul>
 
-      <p>Through this section, I wish the audience to comprehensively understand why these species became extinct and reflect on how we can prevent current species being extinct and protect biodiversity nowadays.</p>
+      <p style="margin-top: 20px;">Through this section, I wish the audience to comprehensively understand why these species became extinct and reflect on how we can prevent current species being extinct and protect biodiversity nowadays.</p>
     </div>
   </div>
 </div>
 
-<script>
-  const btn = document.getElementById("projectInfoBtn");
-  const modal = document.getElementById("projectInfoModal");
-  const closeBtn = document.getElementById("closeProjectInfo");
+<!-- Vote Button & Modal -->
+<button id="voteBtn">Vote</button>
+<div id="voteModal" class="modal">
+  <div class="modal-content">
+    <span id="closeVoteModal" class="close">&times;</span>
+    <h2 style="font-family: Georgia, serif; color: #2f2f2f;">Which one do you wish should be back?</h2>
+    <div style="max-height: 400px; overflow-y: auto;">
+      <div id="voteButtonsContainer" class="vote-grid"></div>
+    </div>
+  </div>
+</div>
 
-  btn.onclick = () => modal.style.display = "block";
-  closeBtn.onclick = () => modal.style.display = "none";
-  window.onclick = e => { if(e.target===modal) modal.style.display="none"; };
+<script src="sketch.js"></script>
+<script>
+  // Modal 邏輯
+  const projectBtn = document.getElementById("projectInfoBtn");
+  const projectModal = document.getElementById("projectInfoModal");
+  const closeProject = document.getElementById("closeProjectInfo");
+  projectBtn.onclick = () => projectModal.style.display = "block";
+  closeProject.onclick = () => projectModal.style.display = "none";
+
+  const voteBtn = document.getElementById("voteBtn");
+  const voteModal = document.getElementById("voteModal");
+  const closeVoteModal = document.getElementById("closeVoteModal");
+  voteBtn.onclick = () => voteModal.style.display = "block";
+  closeVoteModal.onclick = () => voteModal.style.display = "none";
+
+  window.onclick = e => {
+    if(e.target===projectModal) projectModal.style.display="none";
+    if(e.target===voteModal) voteModal.style.display="none";
+  };
 </script>
 </body>
 </html>
